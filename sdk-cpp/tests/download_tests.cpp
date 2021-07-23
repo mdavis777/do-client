@@ -562,13 +562,15 @@ TEST_F(DownloadTests, DownloadWithStreaming)
 
     auto streamCallback = [&outputFile](msdo::download&, gsl::span<unsigned char> buffer)
         {
+            // Decrypt contents of the buffer if needed, then write to output file
+
             outputFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         };
 
     msdo::download_property_value streamCallbackProperty{streamCallback};
     streamingDownload.set_property(msdo::download_property::stream_interface, streamCallbackProperty);
 
-    // streamingDownload.start_and_wait_until_completion();
+    streamingDownload.start_and_wait_until_completion();
 
     outputFile.close();
     ASSERT_EQ(boost::filesystem::file_size(boost::filesystem::path(g_tmpFileName)), g_smallFileSizeBytes);
