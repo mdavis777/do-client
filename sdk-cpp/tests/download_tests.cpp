@@ -550,3 +550,26 @@ TEST_F(DownloadTests, MultipleRestPortFileExists_Download)
     ASSERT_TRUE(boost::filesystem::exists(g_tmpFileName));
     ASSERT_EQ(boost::filesystem::file_size(boost::filesystem::path(g_tmpFileName)), g_smallFileSizeBytes);
 }
+
+TEST_F(DownloadTests, DownloadWithStreaming)
+{
+    msdo::download streamingDownload{g_smallFileUrl};
+
+    std::fstream outputFile;
+    outputFile.exceptions(std::fstream::badbit | std::fstream::failbit);
+    std::ios_base::openmode mode = std::fstream::binary | std::fstream::out | std::fstream::trunc;
+    outputFile.open(g_tmpFileName, mode);
+
+    auto streamCallback = [&outputFile](msdo::download&, gsl::span<unsigned char> buffer)
+        {
+            outputFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+        };
+
+    msdo::download_property_value streamCallbackProperty{streamCallback};
+    streamingDownload.set_property(msdo::download_property::stream_interface, streamCallbackProperty);
+
+    // streamingDownload.start_and_wait_until_completion();
+
+    outputFile.close();
+    ASSERT_EQ(boost::filesystem::file_size(boost::filesystem::path(g_tmpFileName)), g_smallFileSizeBytes);
+}

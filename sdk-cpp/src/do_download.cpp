@@ -20,6 +20,11 @@ download::download(const std::string& uri, const std::string& downloadFilePath)
     _download = std::make_shared<msdod::CDownloadRest>(uri, downloadFilePath);
 }
 
+download::download(const std::string& uri) :
+    download(uri, std::string{})
+{
+}
+
 download::~download() = default;
 
 void download::start()
@@ -45,6 +50,10 @@ void download::finalize()
 void download::abort()
 {
     _download->Abort();
+}
+
+void download::set_property(download_property /*key*/, const download_property_value& /*value*/)
+{
 }
 
 download_status download::get_status() const

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include "do_download_property.h"
 #include "do_download_status.h"
 
 namespace microsoft::deliveryoptimization
@@ -18,6 +19,7 @@ class download
 {
 public:
     download(const std::string& uri, const std::string& downloadFilePath);
+    download(const std::string& uri);
     ~download();
 
     void start();
@@ -25,6 +27,8 @@ public:
     void resume();
     void finalize();
     void abort();
+
+    void set_property(download_property key, const download_property_value& value);
 
     download_status get_status() const;
 
